@@ -48,23 +48,17 @@ data Exp : Env → Set where
     → (ps : Exp (prev ∷ n ∷ e))
     → (n : Exp e)
     → Exp e
-  Π_꞉_,_
-    : {e : Env}
-    → (v : String) → (t : Exp e) → (f : Exp (v ∷ e)) → Exp e
-  π_,_
-    : {e : Env}
-    → (v : String) → (f : Exp (v ∷ e)) → Exp e
-  _◃_ : {e : Env} (f : Exp e) → (a : Exp e) → Exp e
-  Σ_꞉_,_
-    : {e : Env}
-    → (v : String) → (t : Exp e) → (f : Exp (v ∷ e)) → Exp e
-  σ_,_ : {e : Env} → (a : Exp e) → (b : Exp e) → Exp e
+  Π_꞉_,_ : {e : Env} → (v : String) → Exp e → Exp (v ∷ e) → Exp e
+  π_,_ : {e : Env} → (v : String) → Exp (v ∷ e) → Exp e
+  _◃_ : {e : Env} (func : Exp e) → (arg : Exp e) → Exp e
+  Σ_꞉_,_ : {e : Env} → (v : String) → Exp e → Exp (v ∷ e) → Exp e
+  σ_,_ : {e : Env} → Exp e → Exp e → Exp e
   ind-Σ
     : {e : Env} {prj₂ prj₁ : String}
     → (a : Exp (prj₂ ∷ prj₁ ∷ e))
     → (z : Exp e)
     → Exp e
-  _≡_ : {e : Env} → (a : Exp e) → (b : Exp e) → Exp e
+  _≡_ : {e : Env} → Exp e → Exp e → Exp e
 
 infix 9 _◃_
 infix 5 Π_꞉_,_
