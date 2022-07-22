@@ -76,6 +76,7 @@ infix 1 _⊢_type
 infix 1 _⊢_꞉_
 infix 1 _⊢_≐_꞉_
 infix 1 _⊢Judgment_
+infixl -2 Rule_─────_
 infixl -2 _─────_via_
 infixl -2 _^────_via_
 
@@ -318,66 +319,82 @@ module JudgmentExamples where
   example₁ =
     Γ₀ ,̣ "A" ꞉ 𝟘 ,̣ "a" ꞉ "A" #0 ⊢ "a" #0 ꞉ "A" #1
 
-data Rule : List Γ⊢Judgment → Γ⊢Judgment → Set where
+data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
   projection₀
     : {e : Env} {Γ : Context e} {a : String} {A : Exp e}
     → Rule
-      []
-      (Γ ,̣ a ꞉ A ⊢ a #0 ꞉ dropvar A)
+        []
+        ─────
+        Γ ,̣ a ꞉ A ⊢ a #0 ꞉ dropvar A
   projectionᵣ
     : {e : Env} {Γ : Context e} {a : String} {A : Exp e} {j : Judgment e}
       {js : List Γ⊢Judgment}
-    → Rule js (Γ ⊢Judgment j)
-    → Rule js (Γ ,̣ a ꞉ A ⊢Judgment map-env-Judgment (Var ∘ NextVar) j)
+    → Rule
+        js
+        ─────
+        Γ ⊢Judgment j
+    → Rule
+        js
+        ─────
+        Γ ,̣ a ꞉ A ⊢Judgment map-env-Judgment (Var ∘ NextVar) j
   rename₀
     : {e : Env} {Γ : Context e} {a b : String} {A : Exp e}
       {j : Judgment (a ∷ e)}
     → Rule
-      [ Γ ,̣ a ꞉ A ⊢Judgment j ]
-      (Γ ,̣ b ꞉ A ⊢Judgment map-env-Judgment (Var ∘ rename-var) j)
+        [ Γ ,̣ a ꞉ A ⊢Judgment j ]
+        ─────
+        Γ ,̣ b ꞉ A ⊢Judgment map-env-Judgment (Var ∘ rename-var) j
 
   ≡-form
     : {e : Env} {Γ : Context e} {x : String} {a A : Exp e}
     → Rule
-      [ Γ ⊢ a ꞉ A ]
-      (Γ ,̣ x ꞉ A ⊢ dropvar a ≡ x #0 type)
+        [ Γ ⊢ a ꞉ A ]
+        ─────
+        Γ ,̣ x ꞉ A ⊢ dropvar a ≡ x #0 type
 
   Π-form
     : {e : Env} {Γ : Context e} {a : String} {A : Exp e} {B : Exp (a ∷ e)}
     → Rule
-      [ Γ ,̣ a ꞉ A ⊢ B type ]
-      (Γ ⊢ Π a ꞉ A , B type)
+        [ Γ ,̣ a ꞉ A ⊢ B type ]
+        ─────
+        Γ ⊢ Π a ꞉ A , B type
   Π-intro
     : {e : Env} {Γ : Context e} {a : String} {A : Exp e} {b B : Exp (a ∷ e)}
     → Rule
-      [ Γ ,̣ a ꞉ A ⊢ b ꞉ B ]
-      (Γ ⊢ π a , b ꞉ Π a ꞉ A , B)
+        [ Γ ,̣ a ꞉ A ⊢ b ꞉ B ]
+        ─────
+        Γ ⊢ π a , b ꞉ Π a ꞉ A , B
   Π-elim
     : {e : Env} {Γ : Context e} {x : String} {f a A : Exp e} {B : Exp (x ∷ e)}
     → Rule
-      [ Γ ⊢ f ꞉ Π x ꞉ A , B ]
-      (Γ ⊢ f ◃ a ꞉ (B [ a / x ]))
+        [ Γ ⊢ f ꞉ Π x ꞉ A , B ]
+        ─────
+        Γ ⊢ f ◃ a ꞉ (B [ a / x ])
   Π-comp-β
     : {e : Env} {Γ : Context e} {x : String} {a A : Exp e} {b B : Exp (x ∷ e)}
     → Rule
-      [ Γ ,̣ x ꞉ A ⊢ b ꞉ B , Γ ⊢ a ꞉ A ]
-      (Γ ⊢ (π x , b) ◃ a ≐ (b [ a / x ]) ꞉ B [ a / x ])
+        [ Γ ,̣ x ꞉ A ⊢ b ꞉ B , Γ ⊢ a ꞉ A ]
+        ─────
+        Γ ⊢ (π x , b) ◃ a ≐ (b [ a / x ]) ꞉ B [ a / x ]
   Π-comp-η
     : {e : Env} {Γ : Context e} {x : String} {f A : Exp e} {B : Exp (x ∷ e)}
     → Rule
-      [ Γ ⊢ f ꞉ Π x ꞉ A , B ]
-      (Γ ⊢ (π x , dropvar f ◃ x #0) ≐ f ꞉ Π x ꞉ A , B)
+        [ Γ ⊢ f ꞉ Π x ꞉ A , B ]
+        ─────
+        Γ ⊢ (π x , dropvar f ◃ x #0) ≐ f ꞉ Π x ꞉ A , B
 
   Σ-form
     : {e : Env} {Γ : Context e} {a : String} {A : Exp e} {B : Exp (a ∷ e)}
     → Rule
-      [ Γ ,̣ a ꞉ A ⊢ B type ]
-      (Γ ⊢ Σ a ꞉ A , B type)
+        [ Γ ,̣ a ꞉ A ⊢ B type ]
+        ─────
+        Γ ⊢ Σ a ꞉ A , B type
   Σ-intro
     : {e : Env} {Γ : Context e} {x : String} {a A b : Exp e} {B : Exp (x ∷ e)}
     → Rule
-      [ Γ ⊢ a ꞉ A , Γ ⊢ b ꞉ B [ a / x ] ]
-      (Γ ⊢ σ a , b ꞉ Σ x ꞉ A , B)
+        [ Γ ⊢ a ꞉ A , Γ ⊢ b ꞉ B [ a / x ] ]
+        ─────
+        Γ ⊢ σ a , b ꞉ Σ x ꞉ A , B
   -- Σ-elim
   --   : {e : Env} {Γ : Context e} {x z xa ya : String}
   --     {P : Exp e} {D : Exp (z ∷ e)}
@@ -386,13 +403,22 @@ data Rule : List Γ⊢Judgment → Γ⊢Judgment → Set where
   --     []
   --     (Γ ,̣ z ꞉ (Σ x ꞉ P , Q) ⊢ ind-Σ (dropvar a) (z #0)) ꞉ D)
 
-  ℕ-form : Rule [] (Γ₀ ⊢ ℕ type)
-  ℕ-intro-𝟎 : Rule [] (Γ₀ ⊢ 𝟎 ꞉ ℕ)
+  ℕ-form
+    : Rule
+        []
+        ─────
+        Γ₀ ⊢ ℕ type
+  ℕ-intro-𝟎
+    : Rule
+        []
+        ─────
+        Γ₀ ⊢ 𝟎 ꞉ ℕ
   ℕ-intro-s
     : {e : Env} {Γ : Context e} {n : Exp e}
     → Rule
-      [ Γ ⊢ n ꞉ ℕ ]
-      (Γ ⊢ s n ꞉ ℕ)
+        [ Γ ⊢ n ꞉ ℕ ]
+        ─────
+        Γ ⊢ s n ꞉ ℕ
   ℕ-elim
     : {e : Env} {Γ : Context e}
       {xD xb yb x : String}
@@ -400,18 +426,18 @@ data Rule : List Γ⊢Judgment → Γ⊢Judgment → Set where
       {D : Exp (xD ∷ e)}
       {b : Exp (yb ∷ xb ∷ e)}
     → Rule
-      [ Γ ,̣ xD ꞉ ℕ ⊢ D type
-      , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
-      , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ map-env (Var ∘ rename-var) D
-        ⊢ b ꞉ dropvar (map-env (map-var₀ (s (xb #0))) D)
-      ]
-      ( Γ ,̣ x ꞉ ℕ
-      ⊢ indₙ
-          (dropvar a)
-          (w/var-inserted-at x 2 b {tt})
-          (x #0)
-        ꞉ map-env (Var ∘ rename-var) D
-      )
+        [ Γ ,̣ xD ꞉ ℕ ⊢ D type
+        , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
+        , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ map-env (Var ∘ rename-var) D
+            ⊢ b ꞉ dropvar (map-env (map-var₀ (s (xb #0))) D)
+        ]
+        ─────
+        Γ ,̣ x ꞉ ℕ
+        ⊢ indₙ
+            (dropvar a)
+            (w/var-inserted-at x 2 b {tt})
+            (x #0)
+            ꞉ map-env (Var ∘ rename-var) D
   ℕ-comp-𝟎
     : {e : Env} {Γ : Context e}
       {xD xb yb : String}
@@ -419,12 +445,13 @@ data Rule : List Γ⊢Judgment → Γ⊢Judgment → Set where
       {D : Exp (xD ∷ e)}
       {b : Exp (yb ∷ xb ∷ e)}
     → Rule
-      [ Γ ,̣ xD ꞉ ℕ ⊢ D type
-      , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
-      , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ map-env (Var ∘ rename-var) D
-        ⊢ b ꞉ dropvar (map-env (map-var₀ (s (xb #0))) D)
-      ]
-      (Γ ⊢ indₙ a b 𝟎 ≐ a ꞉ D [ 𝟎 / xD ])
+        [ Γ ,̣ xD ꞉ ℕ ⊢ D type
+        , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
+        , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ map-env (Var ∘ rename-var) D
+            ⊢ b ꞉ dropvar (map-env (map-var₀ (s (xb #0))) D)
+        ]
+        ─────
+        Γ ⊢ indₙ a b 𝟎 ≐ a ꞉ D [ 𝟎 / xD ]
   ℕ-comp-s
     : {e : Env} {Γ : Context e}
       {xD xb yb x : String}
@@ -432,25 +459,25 @@ data Rule : List Γ⊢Judgment → Γ⊢Judgment → Set where
       {D : Exp (xD ∷ e)}
       {b : Exp (yb ∷ xb ∷ e)}
     → Rule
-      [ Γ ,̣ xD ꞉ ℕ ⊢ D type
-      , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
-      , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ map-env (Var ∘ rename-var) D
-        ⊢ b ꞉ dropvar (map-env (map-var₀ (s (xb #0))) D)
-      ]
-      ( Γ ,̣ x ꞉ ℕ
-      ⊢ indₙ
-          (dropvar a)
-          (w/var-inserted-at x 2 b {tt})
-          (s (x #0))
-        ≐ map-env (Var ∘ within-var rename-var) b
-          [ indₙ
-              (dropvar a)
-              ((w/var-inserted-at x 2 b {tt}))
-              (x #0)
-          / yb
-          ]
-        ꞉ map-env (map-var₀ (s (x #0))) D
-      )
+        [ Γ ,̣ xD ꞉ ℕ ⊢ D type
+        , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
+        , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ map-env (Var ∘ rename-var) D
+            ⊢ b ꞉ dropvar (map-env (map-var₀ (s (xb #0))) D)
+        ]
+        ─────
+        Γ ,̣ x ꞉ ℕ
+        ⊢ indₙ
+            (dropvar a)
+            (w/var-inserted-at x 2 b {tt})
+            (s (x #0))
+            ≐ map-env (Var ∘ within-var rename-var) b
+            [ indₙ
+                (dropvar a)
+                ((w/var-inserted-at x 2 b {tt}))
+                (x #0)
+            / yb
+            ]
+            ꞉ map-env (map-var₀ (s (x #0))) D
 
 
 data Proof : Γ⊢Judgment → Set where
@@ -458,14 +485,20 @@ data Proof : Γ⊢Judgment → Set where
     : {ins : List Γ⊢Judgment}
     → (inProofs : All Proof ins)
     → (out : Γ⊢Judgment)
-    → Rule ins out
+    → Rule
+        ins
+        ─────
+        out
     → Proof out
 
 _─────_via_
   : {ins : List Γ⊢Judgment}
   → All Proof ins
   → (out : Γ⊢Judgment)
-  → Rule ins out
+  → Rule
+      ins
+      ─────
+      out
   → Proof out
 inProofs ───── out via rule = ApplyRule inProofs out rule
 
@@ -473,7 +506,10 @@ _^────_via_
   : {a : Γ⊢Judgment}
   → Proof a
   → (out : Γ⊢Judgment)
-  → Rule [ a ] out
+  → Rule
+      [ a ]
+      ─────
+      out
   → Proof out
 _^────_via_ x y z = _─────_via_ [ x ] y z
 
