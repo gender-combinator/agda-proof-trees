@@ -1,11 +1,3 @@
-Trying to setup a type checked proof trees, to verify HoTT exercises.
-
-Want a proof tree to look like:
-
-  Γ ,̣ "x" ꞉ A ⊢ b ꞉ B
-  ---[ Π-elim ]
-  Γ ⊢ (π "x" ꞉ A , b) ꞉ Π "x" ꞉ A , B
-
 ```agda
 {-# OPTIONS --without-K --safe #-}
 
