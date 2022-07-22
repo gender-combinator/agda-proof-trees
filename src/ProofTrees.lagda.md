@@ -148,11 +148,11 @@ module ExpShorthand where
         (map-var-to-var f e₂)
     (e ≡ e₁) → map-var-to-var f e ≡ map-var-to-var f e₁
 
-  within-var-mapping
+  within-var-to-env
     : {x : String} {oldEnv newEnv : Env}
     → (VarIn oldEnv → Exp newEnv)
     → VarIn (x ∷ oldEnv) → Exp (x ∷ newEnv)
-  within-var-mapping f = λ where
+  within-var-to-env f = λ where
     (CurrVar v) → Var (CurrVar v)
     (NextVar rst) → map-var-to-var NextVar (f rst)
 
@@ -173,16 +173,16 @@ module ExpShorthand where
       (ind-ℕ e e₁ e₂) →
         ind-ℕ
           (map-env f e)
-          (map-env (within-var-mapping (within-var-mapping f)) e₁)
+          (map-env (within-var-to-env (within-var-to-env f)) e₁)
           (map-env f e₂)
-      (Π v ꞉ e , e₁) → Π v ꞉ map-env f e , map-env (within-var-mapping f) e₁
-      (π v , e) → π v , map-env (within-var-mapping f) e
+      (Π v ꞉ e , e₁) → Π v ꞉ map-env f e , map-env (within-var-to-env f) e₁
+      (π v , e) → π v , map-env (within-var-to-env f) e
       (e ◃ e₁) → map-env f e ◃ map-env f e₁
-      (Σ v ꞉ e , e₁) → Σ v ꞉ map-env f e , map-env (within-var-mapping f) e₁
+      (Σ v ꞉ e , e₁) → Σ v ꞉ map-env f e , map-env (within-var-to-env f) e₁
       (σ e , e₁) → σ map-env f e , map-env f e₁
       (ind-Σ e₁ e₂) →
         ind-Σ
-          (map-env (within-var-mapping (within-var-mapping f)) e₁)
+          (map-env (within-var-to-env (within-var-to-env f)) e₁)
           (map-env f e₂)
       (e ≡ e₁) → map-env f e ≡ map-env f e₁
 
