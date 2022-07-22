@@ -1,3 +1,10 @@
+Defines the *terms* for the Proof Trees to act on.
+
+### To add a new term
+- First add to the Exp type below
+- Then modify the corresponding cases in map-var-to-var and map-env
+See their definitions for more details.
+
 ```agda
 {-# OPTIONS --without-K --safe #-}
 
@@ -12,6 +19,11 @@ infix 5 λ̣_,_
 infix 5 Σ_꞉_,_
 infix 5 σ_,_
 
+```
+Env tracks all variables that a term may reference. (They may come from the surronding Context (Γ) or expressions like Π / Σ / λ̣)
+
+This does allow multiple unique variables to have the same name. But, they will be distinguished when refering to them. Each references (VarIn) refers to a specific variable by index (De Bruijn style) into their environment. (See [ExpShorthand](ExpShorthand.lagda.md) for easy ways to refer to a variable.)
+```agda
 Env = List String
 
 data VarIn : Env → Set where
@@ -48,6 +60,13 @@ within-var f = λ where
   (CurrVar v) → CurrVar v
   (NextVar x) → NextVar (f x)
 
+```
+map-var-to-var and map-env provide generic manipulation of variables in any term. Like common variable substitution or renaming.
+
+They are nearly identical, but map-var-to-var exists to provide a clear terminating definition for Agda.
+
+Most new terms can be added with a similar style case to the ones that already exist, by mapping their nested elements (if any) with the same function. Notice when their elements assume additional variables in their environment, then use the utilities within-var/within-var-to-env to *skip over* those vars. See Π as an example.
+```agda
 map-var-to-var
   : {oldEnv newEnv : Env}
   → (VarIn oldEnv → VarIn newEnv)
