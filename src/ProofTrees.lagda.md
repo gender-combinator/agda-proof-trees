@@ -221,6 +221,20 @@ module ExpShorthand where
         (suc i) (NextVar exp) {p} →
           NextVar (w/var-inserted-at-var v i exp {p})
 
+  subvar-0
+    : (oldVar : String)
+    → {env : Env}
+    → (newExp : Exp env)
+    → (exp : Exp (oldVar ∷ env))
+    → Exp env
+  subvar-0 v {env} newExp e =
+    map-env
+      (λ where
+        (CurrVar _) → newExp
+        (NextVar exp) → Var exp)
+      e
+  syntax subvar-0 v newExp exp = exp [ newExp / v ]
+
   module Specific where
     drop-env₀ : {v : String} → {e : Env} → Exp e → Exp (v ∷ e)
     drop-env₀ = map-env (Var ∘ NextVar)
@@ -252,20 +266,6 @@ module ExpShorthand where
     map-env₀ = map-env ∘ map-var₀
   open Specific
 
-  subvar-0
-    : (oldVar : String)
-    → {env : Env}
-    → (newExp : Exp env)
-    → (exp : Exp (oldVar ∷ env))
-    → Exp env
-  subvar-0 v {env} newExp e =
-    map-env
-      (λ where
-        (CurrVar _) → newExp
-        (NextVar exp) → Var exp)
-      e
-  syntax subvar-0 v newExp exp = exp [ newExp / v ]
-
   _⟶_ : {e : Env} → Exp e → Exp e → {v : String} → Exp e
   (A ⟶ B) {v} = Π v ꞉ A , drop-env₀ B
 
@@ -276,11 +276,8 @@ module ExpExamples where
   e₁ : Exp ("x" ∷ "y" ∷ [])
   e₁ = Π "a" ꞉ "x" #0 , "y" #2
 
-  e2 : Exp ("y" ∷ [])
-  e2 = e₁ [ 𝟘 / "x" ]
-
-  pe2 : Id (e₁ [ 𝟘 / "x" ]) (Π "a" ꞉ 𝟘 , "y" #1)
-  pe2 = ⋯
+  p₁ : Id (e₁ [ 𝟘 / "x" ]) (Π "a" ꞉ 𝟘 , "y" #1)
+  p₁ = ⋯
 
 data Context : Env → Set where
   Γ₀ : Context []
