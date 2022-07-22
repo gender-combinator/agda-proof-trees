@@ -42,9 +42,10 @@ data Exp : Env → Set where
   𝟎 : {e : Env} → Exp e
   s : {e : Env} → Exp e → Exp e
   ind-ℕ
-    : {e : Env} {x y : String}
+    : {e : Env} 
     → (pz : Exp e)
-    → (ps : Exp (y ∷ x ∷ e))
+    → {n prev : String}
+    → (ps : Exp (prev ∷ n ∷ e))
     → (n : Exp e)
     → Exp e
   Π_꞉_,_
@@ -546,9 +547,9 @@ module ProofExamples where
       Γ₀
       ⊢ π "x"
       , π "y"
-      , ind-ℕ {x = "a"} {y = "z"}
+      , ind-ℕ 
           𝟎
-          (s ("z" #0))
+          {n = "a"} {prev = "z"} (s ("z" #0))
           ("y" #0)
       ꞉ ℕ ⟶ ℕ ⟶ ℕ
     )
