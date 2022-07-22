@@ -116,6 +116,46 @@ module ExpShorthand where
     (CurrVar v) → CurrVar v
     (NextVar x) → NextVar (f x)
 
+  map-var-to-var
+    : {oldEnv newEnv : Env}
+    → (VarIn oldEnv → VarIn newEnv)
+    → Exp oldEnv
+    → Exp newEnv
+  map-var-to-var f = λ where
+    (Var x) → Var (f x)
+    𝟘 → 𝟘
+    𝟙 → 𝟙
+    ⋆ → ⋆
+    ℕ → ℕ
+    𝟎 → 𝟎
+    (s e) → s (map-var-to-var f e)
+    (ind-ℕ e e₁ e₂) →
+      ind-ℕ
+        (map-var-to-var f e)
+        (map-var-to-var (within-var (within-var f)) e₁)
+        (map-var-to-var f e₂)
+    (Π v ꞉ e , e₁) →
+      Π v ꞉ map-var-to-var f e , map-var-to-var (within-var f) e₁
+    (π v , e) →
+      π v , map-var-to-var (within-var f) e
+    (e ◃ e₁) → map-var-to-var f e ◃ map-var-to-var f e₁
+    (Σ v ꞉ e , e₁) →
+      Σ v ꞉ map-var-to-var f e , map-var-to-var (within-var f) e₁
+    (σ e , e₁) → σ map-var-to-var f e , map-var-to-var f e₁
+    (ind-Σ e₁ e₂) →
+      ind-Σ
+        (map-var-to-var (within-var (within-var f)) e₁)
+        (map-var-to-var f e₂)
+    (e ≡ e₁) → map-var-to-var f e ≡ map-var-to-var f e₁
+
+  within-var-mapping
+    : {x : String} {oldEnv newEnv : Env}
+    → (VarIn oldEnv → Exp newEnv)
+    → VarIn (x ∷ oldEnv) → Exp (x ∷ newEnv)
+  within-var-mapping f = λ where
+    (CurrVar v) → Var (CurrVar v)
+    (NextVar rst) → map-var-to-var NextVar (f rst)
+
   map-env
     : {oldEnv newEnv : Env}
     → (f : VarIn oldEnv → Exp newEnv)
@@ -145,46 +185,6 @@ module ExpShorthand where
           (map-env (within-var-mapping (within-var-mapping f)) e₁)
           (map-env f e₂)
       (e ≡ e₁) → map-env f e ≡ map-env f e₁
-    where
-      map-var-to-var
-        : {oldEnv newEnv : Env}
-        → (VarIn oldEnv → VarIn newEnv)
-        → Exp oldEnv
-        → Exp newEnv
-      map-var-to-var f = λ where
-        (Var x) → Var (f x)
-        𝟘 → 𝟘
-        𝟙 → 𝟙
-        ⋆ → ⋆
-        ℕ → ℕ
-        𝟎 → 𝟎
-        (s e) → s (map-var-to-var f e)
-        (ind-ℕ e e₁ e₂) →
-          ind-ℕ
-            (map-var-to-var f e)
-            (map-var-to-var (within-var (within-var f)) e₁)
-            (map-var-to-var f e₂)
-        (Π v ꞉ e , e₁) →
-          Π v ꞉ map-var-to-var f e , map-var-to-var (within-var f) e₁
-        (π v , e) →
-          π v , map-var-to-var (within-var f) e
-        (e ◃ e₁) → map-var-to-var f e ◃ map-var-to-var f e₁
-        (Σ v ꞉ e , e₁) →
-          Σ v ꞉ map-var-to-var f e , map-var-to-var (within-var f) e₁
-        (σ e , e₁) → σ map-var-to-var f e , map-var-to-var f e₁
-        (ind-Σ e₁ e₂) →
-          ind-Σ
-            (map-var-to-var (within-var (within-var f)) e₁)
-            (map-var-to-var f e₂)
-        (e ≡ e₁) → map-var-to-var f e ≡ map-var-to-var f e₁
-
-      within-var-mapping
-        : {x : String} {oldEnv newEnv : Env}
-        → (VarIn oldEnv → Exp newEnv)
-        → VarIn (x ∷ oldEnv) → Exp (x ∷ newEnv)
-      within-var-mapping f = λ where
-        (CurrVar v) → Var (CurrVar v)
-        (NextVar rst) → map-var-to-var NextVar (f rst)
 
   insert-index-in : Nat → Env → Set
   insert-index-in = λ where
@@ -221,35 +221,36 @@ module ExpShorthand where
         (suc i) (NextVar exp) {p} →
           NextVar (w/var-inserted-at-var v i exp {p})
 
+  module Specific where
+    drop-env₀ : {v : String} → {e : Env} → Exp e → Exp (v ∷ e)
+    drop-env₀ = map-env (Var ∘ NextVar)
 
-  drop-env₀ : {v : String} → {e : Env} → Exp e → Exp (v ∷ e)
-  drop-env₀ = map-env (Var ∘ NextVar)
+    rename-var : {a b : String} {e : Env} → VarIn (a ∷ e) → VarIn (b ∷ e)
+    rename-var {b = b} = λ where
+        (CurrVar _) → CurrVar b
+        (NextVar x) → NextVar x
+    rename-env₀ : {a b : String} {e : Env} → Exp (a ∷ e) → Exp (b ∷ e)
+    rename-env₀ = map-env (Var ∘ rename-var)
 
-  rename-var : {a b : String} {e : Env} → VarIn (a ∷ e) → VarIn (b ∷ e)
-  rename-var {b = b} = λ where
-    (CurrVar _) → CurrVar b
-    (NextVar x) → NextVar x
-  rename-env₀ : {a b : String} {e : Env} → Exp (a ∷ e) → Exp (b ∷ e)
-  rename-env₀ = map-env (Var ∘ rename-var)
-
-  map-var₀
-    : {x : String} {e pushed : Env}
-    → Exp (pushed ++ e)
-    → VarIn (x ∷ e)
-    → Exp (pushed ++ e)
-  map-var₀ newBot (CurrVar _) = newBot
-  map-var₀ {pushed = p} newBot (NextVar v) = Var (drop-pushed v p)
-    where
-      drop-pushed : {e : Env} → VarIn e → (p : Env) → VarIn (p ++ e)
-      drop-pushed v = λ where
-        [] → v
-        (_ ∷ p) → NextVar (drop-pushed v p)
-  map-env₀
-    : {x : String} {e pushed : Env}
-    → (Exp (pushed ++ e))
-    → Exp (x ∷ e)
-    → Exp (pushed ++ e)
-  map-env₀ = map-env ∘ map-var₀
+    map-var₀
+        : {x : String} {e pushed : Env}
+        → Exp (pushed ++ e)
+        → VarIn (x ∷ e)
+        → Exp (pushed ++ e)
+    map-var₀ newBot (CurrVar _) = newBot
+    map-var₀ {pushed = p} newBot (NextVar v) = Var (drop-pushed v p)
+        where
+        drop-pushed : {e : Env} → VarIn e → (p : Env) → VarIn (p ++ e)
+        drop-pushed v = λ where
+            [] → v
+            (_ ∷ p) → NextVar (drop-pushed v p)
+    map-env₀
+        : {x : String} {e pushed : Env}
+        → (Exp (pushed ++ e))
+        → Exp (x ∷ e)
+        → Exp (pushed ++ e)
+    map-env₀ = map-env ∘ map-var₀
+  open Specific
 
   subvar-0
     : (oldVar : String)
@@ -265,18 +266,11 @@ module ExpShorthand where
       e
   syntax subvar-0 v newExp exp = exp [ newExp / v ]
 
-  within-env
-    : {a : String} {e e' : Env}
-    → (VarIn e → Exp e')
-    → VarIn (a ∷ e) → Exp (a ∷ e')
-  within-env f = λ where
-    (CurrVar v) → Var (CurrVar v)
-    (NextVar x) → drop-env₀ (f x)
-
   _⟶_ : {e : Env} → Exp e → Exp e → {v : String} → Exp e
   (A ⟶ B) {v} = Π v ꞉ A , drop-env₀ B
 
 open ExpShorthand
+open ExpShorthand.Specific
 
 module ExpExamples where
   e₁ : Exp ("x" ∷ "y" ∷ [])
