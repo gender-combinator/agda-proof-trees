@@ -482,40 +482,40 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
             ꞉ map-env₀ (S (x #0)) D
 
 
-data Proof : Γ⊢Judgment → Set where
+data ProofTree : Γ⊢Judgment → Set where
   ApplyRule
     : {ins : List Γ⊢Judgment}
-    → (inProofs : All Proof ins)
+    → (inProofs : All ProofTree ins)
     → (out : Γ⊢Judgment)
     → Rule
         ins
         ─────
         out
-    → Proof out
+    → ProofTree out
 
 _─────_via_
   : {ins : List Γ⊢Judgment}
-  → All Proof ins
+  → All ProofTree ins
   → (out : Γ⊢Judgment)
   → Rule
       ins
       ─────
       out
-  → Proof out
+  → ProofTree out
 inProofs ───── out via rule = ApplyRule inProofs out rule
 
 _^────_via_
   : {a : Γ⊢Judgment}
-  → Proof a
+  → ProofTree a
   → (out : Γ⊢Judgment)
   → Rule
       [ a ]
       ─────
       out
-  → Proof out
+  → ProofTree out
 _^────_via_ x y z = _─────_via_ [ x ] y z
 
-empty : All Proof []
+empty : All ProofTree []
 empty = []
 
 

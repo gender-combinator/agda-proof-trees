@@ -4,7 +4,7 @@ open import ProofTrees
 
 module Examples where
 
-p₁ : Proof (Γ₀ ,̣ "a" ꞉ 𝟘 ⊢ "a" #0 ꞉ 𝟘)
+p₁ : ProofTree (Γ₀ ,̣ "a" ꞉ 𝟘 ⊢ "a" #0 ꞉ 𝟘)
 p₁ =
   empty
   ─────
@@ -13,7 +13,7 @@ p₁ =
 
 
 add
-  : Proof (
+  : ProofTree (
     Γ₀
     ⊢ π "x"
     , π "y"
