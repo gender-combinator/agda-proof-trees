@@ -41,7 +41,7 @@ data Exp : Env → Set where
   ℕ : {e : Env} → Exp e
   𝟎 : {e : Env} → Exp e
   s : {e : Env} → Exp e → Exp e
-  indₙ
+  ind-ℕ
     : {e : Env} {x y : String}
     → (pz : Exp e)
     → (ps : Exp (y ∷ x ∷ e))
@@ -135,8 +135,8 @@ module ExpShorthand where
       ℕ → ℕ
       𝟎 → 𝟎
       (s e) → s (map-env f e)
-      (indₙ e e₁ e₂) →
-        indₙ
+      (ind-ℕ e e₁ e₂) →
+        ind-ℕ
           (map-env f e)
           (map-env (within-var-mapping (within-var-mapping f)) e₁)
           (map-env f e₂)
@@ -164,8 +164,8 @@ module ExpShorthand where
         ℕ → ℕ
         𝟎 → 𝟎
         (s e) → s (map-var-to-var f e)
-        (indₙ e e₁ e₂) →
-          indₙ
+        (ind-ℕ e e₁ e₂) →
+          ind-ℕ
             (map-var-to-var f e)
             (map-var-to-var (within-var (within-var f)) e₁)
             (map-var-to-var f e₂)
@@ -433,7 +433,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
         ]
         ─────
         Γ ,̣ x ꞉ ℕ
-        ⊢ indₙ
+        ⊢ ind-ℕ
             (dropvar a)
             (w/var-inserted-at x 2 b {tt})
             (x #0)
@@ -451,7 +451,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
             ⊢ b ꞉ dropvar (map-env (map-var₀ (s (xb #0))) D)
         ]
         ─────
-        Γ ⊢ indₙ a b 𝟎 ≐ a ꞉ D [ 𝟎 / xD ]
+        Γ ⊢ ind-ℕ a b 𝟎 ≐ a ꞉ D [ 𝟎 / xD ]
   ℕ-comp-s
     : {e : Env} {Γ : Context e}
       {xD xb yb x : String}
@@ -466,12 +466,12 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
         ]
         ─────
         Γ ,̣ x ꞉ ℕ
-        ⊢ indₙ
+        ⊢ ind-ℕ
             (dropvar a)
             (w/var-inserted-at x 2 b {tt})
             (s (x #0))
             ≐ map-env (Var ∘ within-var rename-var) b
-            [ indₙ
+            [ ind-ℕ
                 (dropvar a)
                 ((w/var-inserted-at x 2 b {tt}))
                 (x #0)
@@ -530,7 +530,7 @@ module ProofExamples where
       Γ₀
       ⊢ π "x"
       , π "y"
-      , indₙ {x = "a"} {y = "z"}
+      , ind-ℕ {x = "a"} {y = "z"}
           𝟎
           (s ("z" #0))
           ("y" #0)
@@ -554,13 +554,13 @@ module ProofExamples where
       via ℕ-intro-s
     ]
     ─────
-    Γ₀ ,̣ "x" ꞉ ℕ ,̣ "y" ꞉ ℕ ⊢ indₙ 𝟎 (s ("z" #0)) ("y" #0) ꞉ ℕ
+    Γ₀ ,̣ "x" ꞉ ℕ ,̣ "y" ꞉ ℕ ⊢ ind-ℕ 𝟎 (s ("z" #0)) ("y" #0) ꞉ ℕ
     via ℕ-elim
     ^────
-    Γ₀ ,̣ "x" ꞉ ℕ ⊢ π "y" , indₙ 𝟎 (s ("z" #0)) ("y" #0) ꞉ ℕ ⟶ ℕ
+    Γ₀ ,̣ "x" ꞉ ℕ ⊢ π "y" , ind-ℕ 𝟎 (s ("z" #0)) ("y" #0) ꞉ ℕ ⟶ ℕ
     via Π-intro
     ^────
-    Γ₀ ⊢ π "x" , π "y" , indₙ 𝟎 (s ("z" #0)) ("y" #0) ꞉ ℕ ⟶ ℕ ⟶ ℕ
+    Γ₀ ⊢ π "x" , π "y" , ind-ℕ 𝟎 (s ("z" #0)) ("y" #0) ꞉ ℕ ⟶ ℕ ⟶ ℕ
     via Π-intro
 
 ```
