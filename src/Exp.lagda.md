@@ -20,9 +20,9 @@ infix 5 Σ_꞉_,_
 infix 5 σ_,_
 
 ```
-Env tracks all variables that a term may reference. (They may come from the surronding Context (Γ) or expressions like Π / Σ / λ̣)
+**Env** tracks all variables that a term may reference. (They may come from the surronding Context (Γ) or expressions like Π / Σ / λ̣)
 
-This does allow multiple unique variables to have the same name. But, they will be distinguished when refering to them. Each references (VarIn) refers to a specific variable by index (De Bruijn style) into their environment. (See [ExpShorthand](ExpShorthand.lagda.md) for easy ways to refer to a variable.)
+This does allow multiple unique variables to have the same name. But, they will be distinguished when refering to them. Each references (**VarIn**) refers to a specific variable by index (De Bruijn style) into their environment. (See [ExpShorthand](ExpShorthand.lagda.md) for easy ways to refer to a variable.)
 ```agda
 Env = List String
 
@@ -52,6 +52,13 @@ data Exp : Env → Set where
   Σ_꞉_,_ : {e : Env} → (v : String) → Exp e → Exp (v ∷ e) → Exp e
   σ_,_ : {e : Env} → Exp e → Exp e → Exp e
 
+```
+**map-var-to-var** and **map-env** provide generic manipulation of variables in any term. Like common variable substitution or renaming.
+
+They are nearly identical, but **map-var-to-var** exists to provide a clear terminating definition for Agda.
+
+Most new terms can be added with a similar style case to the ones that already exist, by mapping their nested elements (if any) with the same function. Notice when their elements assume additional variables in their environment, then use the utilities **within-var**/**within-var-to-env** to *skip over* those vars. See Π as an example.
+```agda
 within-var
   : {a : String} {e e' : Env}
   → (VarIn e → VarIn e')
@@ -60,13 +67,6 @@ within-var f = λ where
   (CurrVar v) → CurrVar v
   (NextVar x) → NextVar (f x)
 
-```
-map-var-to-var and map-env provide generic manipulation of variables in any term. Like common variable substitution or renaming.
-
-They are nearly identical, but map-var-to-var exists to provide a clear terminating definition for Agda.
-
-Most new terms can be added with a similar style case to the ones that already exist, by mapping their nested elements (if any) with the same function. Notice when their elements assume additional variables in their environment, then use the utilities within-var/within-var-to-env to *skip over* those vars. See Π as an example.
-```agda
 map-var-to-var
   : {oldEnv newEnv : Env}
   → (VarIn oldEnv → VarIn newEnv)
