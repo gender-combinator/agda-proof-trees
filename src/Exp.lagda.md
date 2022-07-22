@@ -6,6 +6,13 @@ module Exp where
 open import Data.String using (String)
 open import Data.List using (List ; _∷_ ; [])
 
+infix 9 _◃_
+infix 5 Π_꞉_,_
+infix 5 π_,_
+infix 5 Σ_꞉_,_
+infix 5 σ_,_
+infix 3 _≡_
+
 Env = List String
 
 data VarIn : Env → Set where
@@ -39,12 +46,6 @@ data Exp : Env → Set where
     → (z : Exp e)
     → Exp e
   _≡_ : {e : Env} → Exp e → Exp e → Exp e
-infix 9 _◃_
-infix 5 Π_꞉_,_
-infix 5 π_,_
-infix 5 Σ_꞉_,_
-infix 5 σ_,_
-infix 3 _≡_
 
 within-var
   : {a : String} {e e' : Env}
