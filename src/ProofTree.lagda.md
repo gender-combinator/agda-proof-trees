@@ -104,7 +104,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
     → Rule
         [ Γ ,̣ a ꞉ A ⊢ b ꞉ B ]
         ─────
-        Γ ⊢ π a , b ꞉ Π a ꞉ A , B
+        Γ ⊢ λ̣ a , b ꞉ Π a ꞉ A , B
   Π-elim
     : {e : Env} {Γ : Context e} {x : String} {f a A : Exp e} {B : Exp (x ∷ e)}
     → Rule
@@ -116,13 +116,13 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
     → Rule
         [ Γ ,̣ x ꞉ A ⊢ b ꞉ B , Γ ⊢ a ꞉ A ]
         ─────
-        Γ ⊢ (π x , b) ◃ a ≐ (b [ a / x ]) ꞉ B [ a / x ]
+        Γ ⊢ (λ̣ x , b) ◃ a ≐ (b [ a / x ]) ꞉ B [ a / x ]
   Π-comp-η
     : {e : Env} {Γ : Context e} {x : String} {f A : Exp e} {B : Exp (x ∷ e)}
     → Rule
         [ Γ ⊢ f ꞉ Π x ꞉ A , B ]
         ─────
-        Γ ⊢ (π x , drop-env₀ f ◃ x #0) ≐ f ꞉ Π x ꞉ A , B
+        Γ ⊢ (λ̣ x , drop-env₀ f ◃ x #0) ≐ f ꞉ Π x ꞉ A , B
 
   Σ-form
     : {e : Env} {Γ : Context e} {a : String} {A : Exp e} {B : Exp (a ∷ e)}

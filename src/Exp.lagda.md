@@ -8,10 +8,9 @@ open import Data.List using (List ; _∷_ ; [])
 
 infix 9 _◃_
 infix 5 Π_꞉_,_
-infix 5 π_,_
+infix 5 λ̣_,_
 infix 5 Σ_꞉_,_
 infix 5 σ_,_
-infix 3 _≡_
 
 Env = List String
 
@@ -36,7 +35,7 @@ data Exp : Env → Set where
     → (n : Exp e)
     → Exp e
   Π_꞉_,_ : {e : Env} → (v : String) → Exp e → Exp (v ∷ e) → Exp e
-  π_,_ : {e : Env} → (v : String) → Exp (v ∷ e) → Exp e
+  λ̣_,_ : {e : Env} → (v : String) → Exp (v ∷ e) → Exp e
   _◃_ : {e : Env} (func : Exp e) → (arg : Exp e) → Exp e
   Σ_꞉_,_ : {e : Env} → (v : String) → Exp e → Exp (v ∷ e) → Exp e
   σ_,_ : {e : Env} → Exp e → Exp e → Exp e
@@ -69,8 +68,8 @@ map-var-to-var f = λ where
       (map-var-to-var f e₂)
   (Π v ꞉ e , e₁) →
     Π v ꞉ map-var-to-var f e , map-var-to-var (within-var f) e₁
-  (π v , e) →
-    π v , map-var-to-var (within-var f) e
+  (λ̣ v , e) →
+    λ̣ v , map-var-to-var (within-var f) e
   (e ◃ e₁) → map-var-to-var f e ◃ map-var-to-var f e₁
   (Σ v ꞉ e , e₁) →
     Σ v ꞉ map-var-to-var f e , map-var-to-var (within-var f) e₁
@@ -104,7 +103,7 @@ map-env f =
         (map-env (within-var-to-env (within-var-to-env f)) e₁)
         (map-env f e₂)
     (Π v ꞉ e , e₁) → Π v ꞉ map-env f e , map-env (within-var-to-env f) e₁
-    (π v , e) → π v , map-env (within-var-to-env f) e
+    (λ̣ v , e) → λ̣ v , map-env (within-var-to-env f) e
     (e ◃ e₁) → map-env f e ◃ map-env f e₁
     (Σ v ꞉ e , e₁) → Σ v ꞉ map-env f e , map-env (within-var-to-env f) e₁
     (σ e , e₁) → σ map-env f e , map-env f e₁
