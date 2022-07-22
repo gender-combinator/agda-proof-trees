@@ -1,17 +1,26 @@
 ```agda
-{-# OPTIONS --without-K --safe #-}
-
+{-# OPTIONS --safe #-}
 open import ProofTree
 
 module Examples where
+```
 
+Most syntax is close but may vary to work well in Agda. The biggest difference is the lack of horizontal layout of proof trees (that *would* be cool to write in Agda, but sadly not this version). 
+
+Here's some quick examples to get an idea of the syntax:
+
+```agda
 p₁ : ProofTree (Γ₀ ,̣ "a" ꞉ 𝟘 ⊢ "a" #0 ꞉ 𝟘)
 p₁ =
   empty
   ─────
   Γ₀ ,̣ "a" ꞉ 𝟘 ⊢ "a" #0 ꞉ 𝟘
   via projection₀
+```
 
+and a larger example that defines the proof tree for an add function for natural numbers:
+
+```agda
 add
   : ProofTree (
     Γ₀
