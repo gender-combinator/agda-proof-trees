@@ -9,7 +9,7 @@ Want a proof tree to look like:
 ```agda
 {-# OPTIONS --without-K --safe #-}
 
-module ProofTrees where
+module ProofTree where
 
 open import Agda.Builtin.Equality renaming (_≡_ to Id ; refl to ⋯)
 open import Agda.Primitive using (Level)

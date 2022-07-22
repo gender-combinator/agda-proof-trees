@@ -1,6 +1,6 @@
 ```agda
 
-open import ProofTrees
+open import ProofTree
 
 module Examples where
 
