@@ -40,7 +40,7 @@ data Exp : Env → Set where
   ⋆ : {e : Env} → Exp e
   ℕ : {e : Env} → Exp e
   𝟎 : {e : Env} → Exp e
-  s : {e : Env} → Exp e → Exp e
+  S : {e : Env} → Exp e → Exp e
   ind-ℕ
     : {e : Env} 
     → (pz : Exp e)
@@ -128,7 +128,7 @@ module ExpShorthand where
     ⋆ → ⋆
     ℕ → ℕ
     𝟎 → 𝟎
-    (s e) → s (map-var-to-var f e)
+    (S e) → S (map-var-to-var f e)
     (ind-ℕ e e₁ e₂) →
       ind-ℕ
         (map-var-to-var f e)
@@ -169,7 +169,7 @@ module ExpShorthand where
       ⋆ → ⋆
       ℕ → ℕ
       𝟎 → 𝟎
-      (s e) → s (map-env f e)
+      (S e) → S (map-env f e)
       (ind-ℕ e e₁ e₂) →
         ind-ℕ
           (map-env f e)
@@ -423,7 +423,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
     → Rule
         [ Γ ⊢ n ꞉ ℕ ]
         ─────
-        Γ ⊢ s n ꞉ ℕ
+        Γ ⊢ S n ꞉ ℕ
   ℕ-elim
     : {e : Env} {Γ : Context e}
       {xD xb yb x : String}
@@ -434,7 +434,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
         [ Γ ,̣ xD ꞉ ℕ ⊢ D type
         , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
         , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ rename-env₀ D
-            ⊢ b ꞉ drop-env₀ (map-env₀ (s (xb #0)) D)
+            ⊢ b ꞉ drop-env₀ (map-env₀ (S (xb #0)) D)
         ]
         ─────
         Γ ,̣ x ꞉ ℕ
@@ -453,7 +453,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
         [ Γ ,̣ xD ꞉ ℕ ⊢ D type
         , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
         , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ rename-env₀ D
-            ⊢ b ꞉ drop-env₀ (map-env₀ (s (xb #0)) D)
+            ⊢ b ꞉ drop-env₀ (map-env₀ (S (xb #0)) D)
         ]
         ─────
         Γ ⊢ ind-ℕ a b 𝟎 ≐ a ꞉ D [ 𝟎 / xD ]
@@ -467,14 +467,14 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
         [ Γ ,̣ xD ꞉ ℕ ⊢ D type
         , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
         , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ rename-env₀ D
-            ⊢ b ꞉ drop-env₀ (map-env₀ (s (xb #0)) D)
+            ⊢ b ꞉ drop-env₀ (map-env₀ (S (xb #0)) D)
         ]
         ─────
         Γ ,̣ x ꞉ ℕ
         ⊢ ind-ℕ
             (drop-env₀ a)
             (w/var-inserted-at x 2 b {tt})
-            (s (x #0))
+            (S (x #0))
             ≐ map-env (Var ∘ within-var rename-var) b
             [ ind-ℕ
                 (drop-env₀ a)
@@ -482,7 +482,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
                 (x #0)
             / yb
             ]
-            ꞉ map-env₀ (s (x #0)) D
+            ꞉ map-env₀ (S (x #0)) D
 
 
 data Proof : Γ⊢Judgment → Set where
@@ -537,7 +537,7 @@ module ProofExamples where
       , π "y"
       , ind-ℕ 
           𝟎
-          {n = "a"} {prev = "z"} (s ("z" #0))
+          {n = "a"} {prev = "z"} (S ("z" #0))
           ("y" #0)
       ꞉ ℕ ⟶ ℕ ⟶ ℕ
     )
@@ -555,17 +555,17 @@ module ProofExamples where
       Γ₀ ,̣ "x" ꞉ ℕ ,̣ "a" ꞉ ℕ ,̣ "z" ꞉ ℕ ⊢ "z" #0 ꞉ ℕ
       via projection₀
       ^────
-      Γ₀ ,̣ "x" ꞉ ℕ ,̣ "a" ꞉ ℕ ,̣ "z" ꞉ ℕ ⊢ s ("z" #0) ꞉ ℕ
+      Γ₀ ,̣ "x" ꞉ ℕ ,̣ "a" ꞉ ℕ ,̣ "z" ꞉ ℕ ⊢ S ("z" #0) ꞉ ℕ
       via ℕ-intro-s
     ]
     ─────
-    Γ₀ ,̣ "x" ꞉ ℕ ,̣ "y" ꞉ ℕ ⊢ ind-ℕ 𝟎 (s ("z" #0)) ("y" #0) ꞉ ℕ
+    Γ₀ ,̣ "x" ꞉ ℕ ,̣ "y" ꞉ ℕ ⊢ ind-ℕ 𝟎 (S ("z" #0)) ("y" #0) ꞉ ℕ
     via ℕ-elim
     ^────
-    Γ₀ ,̣ "x" ꞉ ℕ ⊢ π "y" , ind-ℕ 𝟎 (s ("z" #0)) ("y" #0) ꞉ ℕ ⟶ ℕ
+    Γ₀ ,̣ "x" ꞉ ℕ ⊢ π "y" , ind-ℕ 𝟎 (S ("z" #0)) ("y" #0) ꞉ ℕ ⟶ ℕ
     via Π-intro
     ^────
-    Γ₀ ⊢ π "x" , π "y" , ind-ℕ 𝟎 (s ("z" #0)) ("y" #0) ꞉ ℕ ⟶ ℕ ⟶ ℕ
+    Γ₀ ⊢ π "x" , π "y" , ind-ℕ 𝟎 (S ("z" #0)) ("y" #0) ꞉ ℕ ⟶ ℕ ⟶ ℕ
     via Π-intro
 
 ```
