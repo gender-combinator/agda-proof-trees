@@ -227,13 +227,15 @@ module ExpShorthand where
           NextVar (w/var-inserted-at-var v i exp {p})
 
 
-  dropvar : {v : String} → {e : Env} → Exp e → Exp (v ∷ e)
-  dropvar = map-env (Var ∘ NextVar)
+  drop-env₀ : {v : String} → {e : Env} → Exp e → Exp (v ∷ e)
+  drop-env₀ = map-env (Var ∘ NextVar)
 
   rename-var : {a b : String} {e : Env} → VarIn (a ∷ e) → VarIn (b ∷ e)
   rename-var {b = b} = λ where
     (CurrVar _) → CurrVar b
     (NextVar x) → NextVar x
+  rename-env₀ : {a b : String} {e : Env} → Exp (a ∷ e) → Exp (b ∷ e)
+  rename-env₀ = map-env (Var ∘ rename-var)
 
   map-var₀
     : {x : String} {e pushed : Env}
@@ -247,6 +249,12 @@ module ExpShorthand where
       drop-pushed v = λ where
         [] → v
         (_ ∷ p) → NextVar (drop-pushed v p)
+  map-env₀
+    : {x : String} {e pushed : Env}
+    → (Exp (pushed ++ e))
+    → Exp (x ∷ e)
+    → Exp (pushed ++ e)
+  map-env₀ = map-env ∘ map-var₀
 
   subvar-0
     : (oldVar : String)
@@ -262,8 +270,16 @@ module ExpShorthand where
       e
   syntax subvar-0 v newExp exp = exp [ newExp / v ]
 
+  within-env
+    : {a : String} {e e' : Env}
+    → (VarIn e → Exp e')
+    → VarIn (a ∷ e) → Exp (a ∷ e')
+  within-env f = λ where
+    (CurrVar v) → Var (CurrVar v)
+    (NextVar x) → drop-env₀ (f x)
+
   _⟶_ : {e : Env} → Exp e → Exp e → {v : String} → Exp e
-  (A ⟶ B) {v} = Π v ꞉ A , dropvar B
+  (A ⟶ B) {v} = Π v ꞉ A , drop-env₀ B
 
 open ExpShorthand
 
@@ -325,7 +341,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
     → Rule
         []
         ─────
-        Γ ,̣ a ꞉ A ⊢ a #0 ꞉ dropvar A
+        Γ ,̣ a ꞉ A ⊢ a #0 ꞉ drop-env₀ A
   projectionᵣ
     : {e : Env} {Γ : Context e} {a : String} {A : Exp e} {j : Judgment e}
       {js : List Γ⊢Judgment}
@@ -350,7 +366,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
     → Rule
         [ Γ ⊢ a ꞉ A ]
         ─────
-        Γ ,̣ x ꞉ A ⊢ dropvar a ≡ x #0 type
+        Γ ,̣ x ꞉ A ⊢ drop-env₀ a ≡ x #0 type
 
   Π-form
     : {e : Env} {Γ : Context e} {a : String} {A : Exp e} {B : Exp (a ∷ e)}
@@ -381,7 +397,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
     → Rule
         [ Γ ⊢ f ꞉ Π x ꞉ A , B ]
         ─────
-        Γ ⊢ (π x , dropvar f ◃ x #0) ≐ f ꞉ Π x ꞉ A , B
+        Γ ⊢ (π x , drop-env₀ f ◃ x #0) ≐ f ꞉ Π x ꞉ A , B
 
   Σ-form
     : {e : Env} {Γ : Context e} {a : String} {A : Exp e} {B : Exp (a ∷ e)}
@@ -401,7 +417,7 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
   --     {Q : Exp (x ∷ e)} {a : Exp (ya ∷ xa ∷ e)}
   --   → Rule
   --     []
-  --     (Γ ,̣ z ꞉ (Σ x ꞉ P , Q) ⊢ ind-Σ (dropvar a) (z #0)) ꞉ D)
+  --     (Γ ,̣ z ꞉ (Σ x ꞉ P , Q) ⊢ ind-Σ (drop-env₀ a) (z #0)) ꞉ D)
 
   ℕ-form
     : Rule
@@ -428,16 +444,16 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
     → Rule
         [ Γ ,̣ xD ꞉ ℕ ⊢ D type
         , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
-        , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ map-env (Var ∘ rename-var) D
-            ⊢ b ꞉ dropvar (map-env (map-var₀ (s (xb #0))) D)
+        , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ rename-env₀ D
+            ⊢ b ꞉ drop-env₀ (map-env₀ (s (xb #0)) D)
         ]
         ─────
         Γ ,̣ x ꞉ ℕ
         ⊢ ind-ℕ
-            (dropvar a)
+            (drop-env₀ a)
             (w/var-inserted-at x 2 b {tt})
             (x #0)
-            ꞉ map-env (Var ∘ rename-var) D
+            ꞉ rename-env₀ D
   ℕ-comp-𝟎
     : {e : Env} {Γ : Context e}
       {xD xb yb : String}
@@ -447,8 +463,8 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
     → Rule
         [ Γ ,̣ xD ꞉ ℕ ⊢ D type
         , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
-        , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ map-env (Var ∘ rename-var) D
-            ⊢ b ꞉ dropvar (map-env (map-var₀ (s (xb #0))) D)
+        , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ rename-env₀ D
+            ⊢ b ꞉ drop-env₀ (map-env₀ (s (xb #0)) D)
         ]
         ─────
         Γ ⊢ ind-ℕ a b 𝟎 ≐ a ꞉ D [ 𝟎 / xD ]
@@ -461,23 +477,23 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
     → Rule
         [ Γ ,̣ xD ꞉ ℕ ⊢ D type
         , Γ ⊢ a ꞉ D [ 𝟎 / xD ]
-        , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ map-env (Var ∘ rename-var) D
-            ⊢ b ꞉ dropvar (map-env (map-var₀ (s (xb #0))) D)
+        , Γ ,̣ xb ꞉ ℕ ,̣ yb ꞉ rename-env₀ D
+            ⊢ b ꞉ drop-env₀ (map-env₀ (s (xb #0)) D)
         ]
         ─────
         Γ ,̣ x ꞉ ℕ
         ⊢ ind-ℕ
-            (dropvar a)
+            (drop-env₀ a)
             (w/var-inserted-at x 2 b {tt})
             (s (x #0))
             ≐ map-env (Var ∘ within-var rename-var) b
             [ ind-ℕ
-                (dropvar a)
-                ((w/var-inserted-at x 2 b {tt}))
+                (drop-env₀ a)
+                (w/var-inserted-at x 2 b {tt})
                 (x #0)
             / yb
             ]
-            ꞉ map-env (map-var₀ (s (x #0))) D
+            ꞉ map-env₀ (s (x #0)) D
 
 
 data Proof : Γ⊢Judgment → Set where
