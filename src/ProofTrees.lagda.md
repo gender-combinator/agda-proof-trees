@@ -60,8 +60,8 @@ data Exp : Env → Set where
     → (v : String) → (t : Exp e) → (f : Exp (v ∷ e)) → Exp e
   σ_,_ : {e : Env} → (a : Exp e) → (b : Exp e) → Exp e
   ind-Σ
-    : {e : Env} {x y : String}
-    → (a : Exp (y ∷ x ∷ e))
+    : {e : Env} {prj₂ prj₁ : String}
+    → (a : Exp (prj₂ ∷ prj₁ ∷ e))
     → (z : Exp e)
     → Exp e
   _≡_ : {e : Env} → (a : Exp e) → (b : Exp e) → Exp e
