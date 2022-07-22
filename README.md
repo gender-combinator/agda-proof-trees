@@ -3,7 +3,9 @@
 Proof trees are nice to look at some times. 🙃
 This library lets you write proof trees and their rules nearly word for word in Agda. 
 
-To get an idea of the syntax see a short and medium [example here](examples/Examples.lagda.md)
+- To get an idea of the syntax see a [short and medium example here](examples/Examples.lagda.md)
+- To add new terms see [Exp](src/Exp.lagda.md)
+- To add new rules see [ProofTree](src/ProofTree.lagda.md)
 
 ## Some gotchas
 ### Syntax
