@@ -101,13 +101,6 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
         ─────
         Γ ,̣ b ꞉ A ⊢Judgment map-env-Judgment (Var ∘ rename-var) j
 
-  ≡-form
-    : {e : Env} {Γ : Context e} {x : String} {a A : Exp e}
-    → Rule
-        [ Γ ⊢ a ꞉ A ]
-        ─────
-        Γ ,̣ x ꞉ A ⊢ drop-env₀ a ≡ x #0 type
-
   Π-form
     : {e : Env} {Γ : Context e} {a : String} {A : Exp e} {B : Exp (a ∷ e)}
     → Rule
@@ -151,13 +144,6 @@ data Rule_─────_ : List Γ⊢Judgment → Γ⊢Judgment → Set where
         [ Γ ⊢ a ꞉ A , Γ ⊢ b ꞉ B [ a / x ] ]
         ─────
         Γ ⊢ σ a , b ꞉ Σ x ꞉ A , B
-  -- Σ-elim
-  --   : {e : Env} {Γ : Context e} {x z xa ya : String}
-  --     {P : Exp e} {D : Exp (z ∷ e)}
-  --     {Q : Exp (x ∷ e)} {a : Exp (ya ∷ xa ∷ e)}
-  --   → Rule
-  --     []
-  --     (Γ ,̣ z ꞉ (Σ x ꞉ P , Q) ⊢ ind-Σ (drop-env₀ a) (z #0)) ꞉ D)
 
   ℕ-form
     : Rule

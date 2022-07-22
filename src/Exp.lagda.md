@@ -40,12 +40,6 @@ data Exp : Env → Set where
   _◃_ : {e : Env} (func : Exp e) → (arg : Exp e) → Exp e
   Σ_꞉_,_ : {e : Env} → (v : String) → Exp e → Exp (v ∷ e) → Exp e
   σ_,_ : {e : Env} → Exp e → Exp e → Exp e
-  ind-Σ
-    : {e : Env} {prj₂ prj₁ : String}
-    → (a : Exp (prj₂ ∷ prj₁ ∷ e))
-    → (z : Exp e)
-    → Exp e
-  _≡_ : {e : Env} → Exp e → Exp e → Exp e
 
 within-var
   : {a : String} {e e' : Env}
@@ -81,11 +75,6 @@ map-var-to-var f = λ where
   (Σ v ꞉ e , e₁) →
     Σ v ꞉ map-var-to-var f e , map-var-to-var (within-var f) e₁
   (σ e , e₁) → σ map-var-to-var f e , map-var-to-var f e₁
-  (ind-Σ e₁ e₂) →
-    ind-Σ
-      (map-var-to-var (within-var (within-var f)) e₁)
-      (map-var-to-var f e₂)
-  (e ≡ e₁) → map-var-to-var f e ≡ map-var-to-var f e₁
 
 within-var-to-env
   : {x : String} {oldEnv newEnv : Env}
@@ -119,9 +108,4 @@ map-env f =
     (e ◃ e₁) → map-env f e ◃ map-env f e₁
     (Σ v ꞉ e , e₁) → Σ v ꞉ map-env f e , map-env (within-var-to-env f) e₁
     (σ e , e₁) → σ map-env f e , map-env f e₁
-    (ind-Σ e₁ e₂) →
-      ind-Σ
-        (map-env (within-var-to-env (within-var-to-env f)) e₁)
-        (map-env f e₂)
-    (e ≡ e₁) → map-env f e ≡ map-env f e₁
 ```
