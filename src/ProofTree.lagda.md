@@ -1,3 +1,13 @@
+Defines the *syntax* and *rules* for Proof Trees.
+
+### To add new rules
+- Add a new instance to Rule_─────_
+
+  These will be in a similar format to rules for proof trees.
+  - List their dependencies in the list before the ─────
+  - And their deduction after it
+  
+
 ```agda
 {-# OPTIONS --without-K --safe #-}
 
