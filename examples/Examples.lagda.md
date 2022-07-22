@@ -1,4 +1,5 @@
 ```agda
+{-# OPTIONS --without-K --safe #-}
 
 open import ProofTree
 
