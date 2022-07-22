@@ -35,5 +35,8 @@ will have the following error message:
 when checking that the expression "x" #0 has type Exp [ "y" , "x" ]
 ```
 
+Be aware, they *do* allow overlapping variable names because of this, which Agda will not catch. 
+Reusing the same variable name is completely fine in this model, as long as you're referring to actual index you want.
+
 ### Rules
 Rules make common use of context (env) manipulation, since that needs to be done manually to let Agda track variables. See some rules for examples to pull from like ```ℕ-elim```.
