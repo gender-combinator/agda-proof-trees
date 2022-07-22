@@ -269,8 +269,8 @@ module ExpShorthand where
   _⟶_ : {e : Env} → Exp e → Exp e → {v : String} → Exp e
   (A ⟶ B) {v} = Π v ꞉ A , drop-env₀ B
 
-open ExpShorthand
-open ExpShorthand.Specific
+open ExpShorthand public
+open ExpShorthand.Specific public
 
 module ExpExamples where
   e₁ : Exp ("x" ∷ "y" ∷ [])
@@ -518,51 +518,5 @@ _^────_via_ x y z = _─────_via_ [ x ] y z
 empty : All Proof []
 empty = []
 
-module ProofExamples where
-  p₁ : Proof (Γ₀ ,̣ "a" ꞉ 𝟘 ⊢ "a" #0 ꞉ 𝟘)
-  p₁ =
-    empty
-    ─────
-    Γ₀ ,̣ "a" ꞉ 𝟘 ⊢ "a" #0 ꞉ 𝟘
-    via projection₀
-
-
-  add
-    : Proof (
-      Γ₀
-      ⊢ π "x"
-      , π "y"
-      , ind-ℕ 
-          𝟎
-          {n = "a"} {prev = "z"} (S ("z" #0))
-          ("y" #0)
-      ꞉ ℕ ⟶ ℕ ⟶ ℕ
-    )
-  add =
-    [ empty
-      ─────
-      Γ₀ ,̣ "x" ꞉ ℕ ,̣ "y" ꞉ ℕ ⊢ ℕ type
-      via projectionᵣ (projectionᵣ ℕ-form)
-    , empty
-      ─────
-      Γ₀ ,̣ "x" ꞉ ℕ ⊢ 𝟎 ꞉ ℕ
-      via projectionᵣ ℕ-intro-𝟎
-    , empty
-      ─────
-      Γ₀ ,̣ "x" ꞉ ℕ ,̣ "a" ꞉ ℕ ,̣ "z" ꞉ ℕ ⊢ "z" #0 ꞉ ℕ
-      via projection₀
-      ^────
-      Γ₀ ,̣ "x" ꞉ ℕ ,̣ "a" ꞉ ℕ ,̣ "z" ꞉ ℕ ⊢ S ("z" #0) ꞉ ℕ
-      via ℕ-intro-s
-    ]
-    ─────
-    Γ₀ ,̣ "x" ꞉ ℕ ,̣ "y" ꞉ ℕ ⊢ ind-ℕ 𝟎 (S ("z" #0)) ("y" #0) ꞉ ℕ
-    via ℕ-elim
-    ^────
-    Γ₀ ,̣ "x" ꞉ ℕ ⊢ π "y" , ind-ℕ 𝟎 (S ("z" #0)) ("y" #0) ꞉ ℕ ⟶ ℕ
-    via Π-intro
-    ^────
-    Γ₀ ⊢ π "x" , π "y" , ind-ℕ 𝟎 (S ("z" #0)) ("y" #0) ꞉ ℕ ⟶ ℕ ⟶ ℕ
-    via Π-intro
 
 ```

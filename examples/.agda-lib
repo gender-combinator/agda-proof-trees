@@ -1,0 +1,6 @@
+name: agda-proof-trees-examples
+include:
+  .
+  ../src
+depend:
+  standard-library
