@@ -1,0 +1,5 @@
+name: agda-proof-trees
+include:
+  src
+depend:
+  standard-library
