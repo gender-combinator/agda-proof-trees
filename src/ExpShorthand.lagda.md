@@ -1,3 +1,20 @@
+Several utility functions that make writing terms shorter and more readable.
+
+Useful ones to start with:
+- Variable references: _#0 , _#1 , _#2
+
+  The number refers to the variables index into the environment.
+
+  Used like: "x" #0
+
+- Variable substitution: <exp> [ <new-exp> / <var-to-substitute> ]
+
+  For example, to substitue the variable "x" for the term ℕ in D:
+
+  D [ ℕ / "x" ]
+
+- Function types: A ⟶ B
+
 ```agda
 {-# OPTIONS --without-K --safe #-}
 
